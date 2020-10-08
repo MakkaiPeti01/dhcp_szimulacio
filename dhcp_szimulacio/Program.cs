@@ -12,16 +12,17 @@ namespace dhcp_szimulacio
         static List<string> excluded = new List<string>();
         static Dictionary<string, string> dhcp = new Dictionary<string, string>();
         static Dictionary<string, string> reserved = new Dictionary<string, string>();
-        static void beolvasExclude()
+        static List<string> commands = new List<string>();
+        static void beolvasList(List<string>l,string filename)
         {
             try
             {
-                StreamReader fajl = new StreamReader("excluded.csv");
+                StreamReader fajl = new StreamReader(filename);
                 try
                 {
                     while (!fajl.EndOfStream)
                     {
-                        excluded.Add(fajl.ReadLine());
+                        l.Add(fajl.ReadLine());
                     }
                 }
                 catch (Exception ex)
@@ -75,15 +76,37 @@ namespace dhcp_szimulacio
                 Console.WriteLine(ex);
             }
         }
+        static void Feladat(string parancs)
+        {
+            //elősször csak a "request"
+            /*megnézzük, hogy "request"-e*/
+            if (parancs.Contains("request"))
+            {
+                Console.WriteLine("Ez oké");
+            }
+            else
+            {
+                Console.WriteLine("Nem oké");
+            }
+        }
+        static void Feladatok()
+        {
+            foreach (var command in commands)
+            {
+                Feladat(command);
+            }
+        }
         static void Main(string[] args)
         {
-            beolvasExclude();
+            beolvasList(excluded,"excluded.csv");
+            beolvasList(commands,"test.csv");
             beolvasDictionary(dhcp,"dhcp.csv");
             beolvasDictionary(reserved,"reserved.csv");
-            foreach (var i in reserved)
+            Feladat("ebben van request");
+            /*foreach (var i in commands)
             {
                 Console.WriteLine(i);
-            }
+            }*/
             Console.WriteLine("\nVége...");
             Console.WriteLine(EggyelNo("192.168.10.100"));
             Console.ReadLine();
