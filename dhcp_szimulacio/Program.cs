@@ -82,7 +82,40 @@ namespace dhcp_szimulacio
             /*megnézzük, hogy "request"-e*/
             if (parancs.Contains("request"))
             {
-                Console.WriteLine("Ez oké");
+                string[] a = parancs.Split(';');
+                string mac = a[1];
+                if (dhcp.ContainsKey(mac))
+                {
+                    Console.WriteLine("DHCP {0}, {1}",mac,dhcp[mac]);
+                }
+                else
+                {
+                    if (reserved.ContainsKey(mac))
+                    {
+                        Console.WriteLine("Reserved {0} {1}",mac,reserved[mac]);
+                        dhcp.Add(mac, reserved[mac]);
+                    }
+                    else
+                    {
+                        string indulo = "192.168.10.100";
+                        int okt4 = 100;
+                        while (okt4 < 200 && (dhcp.ContainsValue(indulo) || reserved.ContainsValue(indulo)
+                            || excluded.Contains(indulo)))
+                        {
+                            okt4++;
+                            indulo = EggyelNo(indulo);
+                        }
+                        if (okt4 < 200)
+                        {
+                            Console.WriteLine($"Kiosztott {mac} --> {indulo}");
+                            dhcp.Add(mac,indulo);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{mac} nincs ip");
+                        }
+                    }
+                }
             }
             else
             {
@@ -102,7 +135,8 @@ namespace dhcp_szimulacio
             beolvasList(commands,"test.csv");
             beolvasDictionary(dhcp,"dhcp.csv");
             beolvasDictionary(reserved,"reserved.csv");
-            Feladat("ebben van request");
+            
+            Feladatok();
             /*foreach (var i in commands)
             {
                 Console.WriteLine(i);
